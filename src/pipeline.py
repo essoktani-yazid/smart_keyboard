@@ -5,17 +5,37 @@ P(w_i | w_{i-n+1} ... w_{i-1}) = (count(context + w) + k) / (count(context) + k 
 import csv
 import math
 from collections import Counter, defaultdict
+from datasets import load_dataset
+import re
+from collections import defaultdict
 
 BOS, EOS, UNK = "<s>", "</s>", "<unk>"
 
 
 # ----------------------------------------------------------------- data
-def load_documents(path="data/corpus.csv"):
-    """Return {doc_id: [sentence_tokens, ...]} (tokens are already lower-case, space separated)."""
+# def load_documents(path="data/corpus.csv"):
+#     """Return {doc_id: [sentence_tokens, ...]} (tokens are already lower-case, space separated)."""
+#     docs = defaultdict(list)
+#     with open(path, encoding="utf-8") as f:
+#         for row in csv.DictReader(f):
+#             docs[int(row["doc_id"])].append(row["sentence"].split())
+#     return dict(docs)
+def load_documents(num_docs=2000):
+    """Charge les critiques de films allocine depuis Hugging Face."""
+    # On limite à 2000 documents pour l'entraînement local afin d'éviter de saturer votre RAM
+    dataset = load_dataset("allocine", split=f"train[:{num_docs}]")
     docs = defaultdict(list)
-    with open(path, encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            docs[int(row["doc_id"])].append(row["sentence"].split())
+    
+    for i, row in enumerate(dataset):
+        review = row["review"].lower()
+        # Séparer les phrases par les points
+        phrases = review.split('.')
+        for phrase in phrases:
+            # Conserver uniquement les mots (nettoyage de la ponctuation)
+            mots = re.sub(r'[^\w\s]', ' ', phrase).split()
+            if mots:
+                docs[i].append(mots)
+                
     return dict(docs)
 
 

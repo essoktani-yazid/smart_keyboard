@@ -17,7 +17,8 @@ def get_models():
 
 (tri, bi, uni), sentences = get_models()
 
-text = st.text_input("Type the beginning of a sentence:", "the happy girls")
+# text = st.text_input("Type the beginning of a sentence:", "the happy girls")
+text = st.text_input("Tapez le début d'une phrase :", "le film est")
 words = text.lower().replace(".", " . ").split()
 unknown = [w for w in words if w not in uni.vocab]
 
