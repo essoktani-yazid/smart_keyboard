@@ -4,38 +4,35 @@ P(w_i | w_{i-n+1} ... w_{i-1}) = (count(context + w) + k) / (count(context) + k 
 """
 import csv
 import math
+import re
 from collections import Counter, defaultdict
 from datasets import load_dataset
-import re
-from collections import defaultdict
 
 BOS, EOS, UNK = "<s>", "</s>", "<unk>"
 
 
 # ----------------------------------------------------------------- data
-# def load_documents(path="data/corpus.csv"):
-#     """Return {doc_id: [sentence_tokens, ...]} (tokens are already lower-case, space separated)."""
-#     docs = defaultdict(list)
-#     with open(path, encoding="utf-8") as f:
-#         for row in csv.DictReader(f):
-#             docs[int(row["doc_id"])].append(row["sentence"].split())
-#     return dict(docs)
-def load_documents(num_docs=2000):
-    """Charge les critiques de films allocine depuis Hugging Face."""
-    # On limite à 2000 documents pour l'entraînement local afin d'éviter de saturer votre RAM
-    dataset = load_dataset("allocine", split=f"train[:{num_docs}]")
+def load_documents(num_docs=2000, fallback_path="data/corpus.csv"):
+    """Charge les critiques de films allocine depuis Hugging Face (ou fallback local)."""
     docs = defaultdict(list)
-    
-    for i, row in enumerate(dataset):
-        review = row["review"].lower()
-        # Séparer les phrases par les points
-        phrases = review.split('.')
-        for phrase in phrases:
-            # Conserver uniquement les mots (nettoyage de la ponctuation)
-            mots = re.sub(r'[^\w\s]', ' ', phrase).split()
-            if mots:
-                docs[i].append(mots)
-                
+    try:
+        # On limite à num_docs pour l'entraînement local afin d'éviter de saturer la RAM
+        dataset = load_dataset("allocine", split=f"train[:{num_docs}]")
+        for i, row in enumerate(dataset):
+            review = row["review"].lower()
+            # Séparer les phrases par les points
+            phrases = review.split('.')
+            for phrase in phrases:
+                # Conserver uniquement les mots (nettoyage de la ponctuation)
+                mots = re.sub(r'[^\w\s]', ' ', phrase).split()
+                if mots:
+                    docs[i].append(mots)
+    except Exception as e:
+        # Fallback local transparent si hors ligne
+        if csv and fallback_path:
+            with open(fallback_path, encoding="utf-8") as f:
+                for row in csv.DictReader(f):
+                    docs[int(row["doc_id"])].append(row["sentence"].split())
     return dict(docs)
 
 
@@ -82,6 +79,14 @@ class NGramModel:
         return {w: self.prob(ctx, w) for w in self.vocab if w != UNK}
 
     def top_k(self, words, k=3):
+        ctx = self.context(words)
+        counts = self.ctx_counts.get(ctx)
+        if counts:
+            total = self.ctx_totals.get(ctx, 0)
+            den = total + self.k * self.V
+            seen_sorted = sorted(counts.items(), key=lambda x: (-x[1], x[0]))
+            if len(seen_sorted) >= k:
+                return [(w, (c + self.k) / den) for w, c in seen_sorted[:k]]
         dist = self.next_word_distribution(words)
         return sorted(dist.items(), key=lambda x: (-x[1], x[0]))[:k]
 
@@ -148,6 +153,79 @@ def backoff_top_k(tri, bi, uni, words, k=3):
         if model.seen_context(words) or model.n == 1:
             return model.top_k(words, k), f"{model.n}-gram"
     return [], "none"
+
+
+def complete_current_word(tri, bi, uni, context_words, prefix, k=5):
+    """Complète le mot actuellement en cours de frappe (préfixe) selon le contexte n-gram."""
+    prefix = prefix.strip().lower()
+    if not prefix:
+        return []
+
+    # Vocabulaire filtré par le préfixe (excluant symboles techniques)
+    candidates = [w for w in uni.vocab if w.startswith(prefix) and w not in (BOS, EOS, UNK)]
+    if not candidates:
+        return []
+
+    tri_ctx = tri.context(context_words) if context_words else ()
+    bi_ctx = bi.context(context_words[-1:] if context_words else []) if context_words else ()
+
+    tri_counts = tri.ctx_counts.get(tri_ctx, {}) if tri_ctx else {}
+    bi_counts = bi.ctx_counts.get(bi_ctx, {}) if bi_ctx else {}
+
+    scored = []
+    for w in candidates:
+        if w in tri_counts:
+            p = tri.prob(tri_ctx, w)
+            tier = 3
+            source = "3-gram"
+        elif w in bi_counts:
+            p = bi.prob(bi_ctx, w)
+            tier = 2
+            source = "2-gram"
+        else:
+            p = uni.prob((), w)
+            tier = 1
+            source = "1-gram"
+        scored.append((tier, p, w, source))
+
+    # Trier par tier décroissant, puis probabilité décroissante, puis ordre alphabétique
+    scored.sort(key=lambda x: (-x[0], -x[1], x[2]))
+    top = scored[:k]
+
+    total_p = sum(x[1] for x in top) or 1.0
+    return [
+        {
+            "word": w,
+            "prob": p,
+            "norm_score": round((p / total_p) * 100, 1),
+            "tier": tier,
+            "source": src,
+            "prefix": prefix,
+            "suffix": w[len(prefix):]
+        }
+        for tier, p, w, src in top
+    ]
+
+
+def predict_next_word(tri, bi, uni, words, k=4):
+    """Prédit les mots suivants les plus probables à partir de l'historique."""
+    suggestions, order = backoff_top_k(tri, bi, uni, words, k)
+    if not suggestions:
+        return [], order
+
+    total_p = sum(p for _, p in suggestions) or 1.0
+    results = []
+    for w, p in suggestions:
+        label = "Fin de phrase" if w == EOS else w
+        results.append({
+            "word": w,
+            "display": label,
+            "prob": p,
+            "norm_score": round((p / total_p) * 100, 1),
+            "is_eos": (w == EOS),
+            "source": order
+        })
+    return results, order
 
 
 def top_k_accuracy(model, sentences, k=3):
