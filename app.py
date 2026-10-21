@@ -1,4 +1,4 @@
-"""Lab 02 - Smart Keyboard V1 (Hostinger/Paddle SaaS Light UI).
+"""Lab 02 - Smart Keyboard V1 (Modern SaaS UI with Font Awesome & Paddle/Hostinger aesthetics).
 Run:  streamlit run app.py
 """
 import streamlit as st
@@ -14,10 +14,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Global CSS for Streamlit Light Theme
+# Custom Global CSS for Streamlit Light Theme + Font Awesome
 st.markdown("""
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -36,15 +37,15 @@ st.markdown("""
     .block-container {
         padding-top: 1.2rem !important;
         padding-bottom: 2rem !important;
-        max-width: 1200px;
+        max-width: 1240px;
     }
-    /* Streamlit widgets styling for light mode */
     div[data-testid="stMetricValue"] {
         color: #0f172a !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
     }
     div[data-testid="stMetricLabel"] {
         color: #64748b !important;
+        font-weight: 600 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -61,23 +62,30 @@ def get_models(num_docs=1000, k=0.1):
     return (tri, bi, uni), sentences, docs
 
 
-# Sidebar Controls & Analytics (Clean Light Design)
+# Sidebar Controls & Analytics (Clean Light Design with Font Awesome)
 with st.sidebar:
     st.markdown("""
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <div style="background: linear-gradient(135deg, #4f46e5, #6366f1); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow: 0 4px 12px rgba(79,70,229,0.25);">
-            ⌨️
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <div style="background: linear-gradient(135deg, #4f46e5, #6366f1); width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ffffff; font-size:18px; box-shadow: 0 4px 14px rgba(79,70,229,0.28);">
+            <i class="fa-solid fa-keyboard"></i>
         </div>
         <div>
-            <div style="font-size:16px; font-weight:800; color:#0f172a; letter-spacing:-0.01em;">Smart Keyboard</div>
-            <div style="font-size:12px; font-weight:600; color:#64748b;">NLP Lab 02 • Light & Fast</div>
+            <div style="font-size:16px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">Smart Keyboard</div>
+            <div style="font-size:12px; font-weight:600; color:#64748b; display:flex; align-items:center; gap:5px;">
+                <i class="fa-solid fa-bolt" style="color:#10b981; font-size:10px;"></i> NLP Lab 02 • Light & Fast
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<hr style='border:none; border-top:1px solid #e2e8f0; margin:12px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border:none; border-top:1px solid #e2e8f0; margin:14px 0;'>", unsafe_allow_html=True)
 
-    st.markdown("<div style='font-size:13px; font-weight:700; color:#1e293b; margin-bottom:6px;'>Paramètres du modèle</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='font-size:12.5px; font-weight:700; color:#1e293b; margin-bottom:8px; display:flex; align-items:center; gap:6px;'>
+        <i class="fa-solid fa-sliders" style="color:#4f46e5;"></i> Paramètres du modèle
+    </div>
+    """, unsafe_allow_html=True)
+
     smoothing_k = st.select_slider(
         "Lissage add-k (k)",
         options=[0.01, 0.05, 0.1, 0.2, 0.5, 1.0],
@@ -90,14 +98,18 @@ with st.sidebar:
         max_value=3000,
         value=1000,
         step=500,
-        help="Nombre de critiques de films chargées (1000 pour une exécution légère et rapide)."
+        help="Nombre de critiques chargées (1000 pour une exécution légère et rapide)."
     )
 
     (tri, bi, uni), sentences, docs = get_models(num_docs=docs_limit, k=smoothing_k)
     port = start_suggestion_server(tri, bi, uni)
 
     st.markdown("<hr style='border:none; border-top:1px solid #e2e8f0; margin:16px 0;'>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:13px; font-weight:700; color:#1e293b; margin-bottom:8px;'>Statistiques du Corpus</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='font-size:12.5px; font-weight:700; color:#1e293b; margin-bottom:8px; display:flex; align-items:center; gap:6px;'>
+        <i class="fa-solid fa-chart-pie" style="color:#059669;"></i> Statistiques du Corpus
+    </div>
+    """, unsafe_allow_html=True)
     
     col_a, col_b = st.columns(2)
     with col_a:
@@ -108,18 +120,20 @@ with st.sidebar:
         st.metric("Trigrammes", f"{len(tri.ctx_counts):,}")
 
     st.markdown("""
-    <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 18px;">
-        <div style="font-size:12px; font-weight:700; color:#4f46e5; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">⚡ Raccourcis Clavier</div>
-        <div style="font-size:12.5px; color:#475569; line-height:1.7;">
-            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:600; color:#0f172a;">Tab ⇥</kbd> : Compléter le mot en cours<br>
-            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:600; color:#0f172a;">→ Flèche</kbd> : Insérer le mot suivant<br>
-            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:600; color:#0f172a;">Clic</kbd> : Insérer une suggestion
+    <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 20px;">
+        <div style="font-size:11.5px; font-weight:800; color:#4f46e5; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em; display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-keyboard"></i> Raccourcis Clavier
+        </div>
+        <div style="font-size:12.5px; color:#475569; line-height:1.8;">
+            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:700; color:#0f172a;"><i class="fa-solid fa-arrow-right-to-bracket" style="font-size:10px;"></i> Tab</kbd> Compléter mot<br>
+            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:700; color:#0f172a;"><i class="fa-solid fa-arrow-right" style="font-size:10px;"></i></kbd> Mot suivant<br>
+            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:700; color:#0f172a;"><i class="fa-solid fa-mouse-pointer" style="font-size:10px;"></i> Clic</kbd> Insérer carte
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 
-# Generate the Light Paddle / Hostinger Component HTML
+# Generate the Modern Hostinger/Paddle Component HTML with Font Awesome 6
 component_html = f"""
 <!DOCTYPE html>
 <html lang="fr" data-theme="light">
@@ -129,7 +143,8 @@ component_html = f"""
     <title>Smart Keyboard Light Component</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* LIGHT THEME (DEFAULT - PADDLE & HOSTINGER SAAS STYLE) */
         :root {{
@@ -146,24 +161,24 @@ component_html = f"""
             --text-muted: #94a3b8;
             --primary: #4f46e5;
             --primary-light: #6366f1;
-            --primary-glow: rgba(79, 70, 229, 0.15);
+            --primary-glow: rgba(79, 70, 229, 0.14);
             --emerald: #059669;
             --emerald-bg: rgba(16, 185, 129, 0.1);
             --amber: #d97706;
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 10px 15px -3px rgba(79, 70, 229, 0.1), 0 4px 6px -4px rgba(79, 70, 229, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(79, 70, 229, 0.12), 0 4px 6px -4px rgba(79, 70, 229, 0.06);
             --kbd-bg: #f8fafc;
             --kbd-border: #cbd5e1;
             --kbd-border-b: #94a3b8;
             --kbd-text: #1e293b;
         }}
 
-        /* DARK THEME (OPTIONAL TOGGLE) */
+        /* DARK THEME (TOGGLE) */
         [data-theme="dark"] {{
             --bg-page: #0b0f19;
             --bg-card: #111827;
             --bg-card-hover: #172136;
-            --bg-card-top: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%);
+            --bg-card-top: linear-gradient(135deg, rgba(99, 102, 241, 0.09) 0%, rgba(255, 255, 255, 0.015) 100%);
             --bg-input: #0d1322;
             --border-subtle: rgba(255, 255, 255, 0.08);
             --border-card-top: rgba(99, 102, 241, 0.35);
@@ -204,7 +219,7 @@ component_html = f"""
         .wrapper {{
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             max-width: 100%;
         }}
 
@@ -229,17 +244,24 @@ component_html = f"""
             font-weight: 800;
             letter-spacing: -0.025em;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+
+        .main-title i {{
+            color: var(--primary);
         }}
 
         .status-pill {{
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 10px;
+            padding: 4px 11px;
             background: var(--emerald-bg);
             border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 9999px;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--emerald);
         }}
@@ -259,22 +281,21 @@ component_html = f"""
             100% {{ transform: scale(0.95); opacity: 0.8; }}
         }}
 
-        /* Controls right side */
+        /* Header Controls Right */
         .header-right {{
             display: flex;
             align-items: center;
             gap: 10px;
         }}
 
-        /* Theme toggle button */
         .btn-theme {{
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
+            padding: 6px 13px;
             border-radius: 10px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
@@ -287,7 +308,7 @@ component_html = f"""
             border-color: #cbd5e1;
         }}
 
-        /* Mode Switcher Tabs (Paddle/Hostinger modern pill toggle) */
+        /* Mode Switcher Tabs */
         .mode-toggle {{
             display: inline-flex;
             background: #f1f5f9;
@@ -313,14 +334,14 @@ component_html = f"""
             transition: all 0.15s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }}
 
         .tab-btn.active {{
             background: #ffffff;
             color: var(--primary);
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-            font-weight: 700;
+            font-weight: 800;
         }}
 
         [data-theme="dark"] .tab-btn.active {{
@@ -341,14 +362,65 @@ component_html = f"""
             box-shadow: var(--shadow-card);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
             position: relative;
         }}
 
-        /* Input Box */
-        .input-container {{
+        /* N-gram Context Sliding Window Ribbon */
+        .context-flow-bar {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }}
+
+        [data-theme="dark"] .context-flow-bar {{
+            background: rgba(255, 255, 255, 0.025);
+        }}
+
+        .context-chip {{
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px;
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }}
+
+        [data-theme="dark"] .context-chip {{
+            background: #1e293b;
+        }}
+
+        .context-arrow {{
+            color: var(--text-muted);
+            font-size: 10px;
+        }}
+
+        /* Input Area */
+        .input-wrapper {{
             position: relative;
             width: 100%;
+            display: flex;
+            align-items: center;
+        }}
+
+        .input-icon-left {{
+            position: absolute;
+            left: 18px;
+            color: var(--primary);
+            font-size: 16px;
+            pointer-events: none;
         }}
 
         .input-box {{
@@ -356,7 +428,7 @@ component_html = f"""
             background: var(--bg-input);
             border: 1.5px solid var(--border-subtle);
             border-radius: 14px;
-            padding: 16px 18px;
+            padding: 16px 18px 16px 46px;
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 16.5px;
             font-weight: 500;
@@ -370,12 +442,27 @@ component_html = f"""
 
         .input-box:focus {{
             border-color: var(--border-active);
-            box-shadow: 0 0 0 3px var(--primary-glow);
+            box-shadow: 0 0 0 3.5px var(--primary-glow);
         }}
 
         .input-box::placeholder {{
             color: var(--text-muted);
             font-weight: 400;
+        }}
+
+        /* Word and character counter */
+        .input-counter {{
+            position: absolute;
+            right: 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-card);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            pointer-events: none;
         }}
 
         /* Toolbar */
@@ -414,16 +501,19 @@ component_html = f"""
             font-weight: 700;
             color: var(--kbd-text);
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }}
 
         .btn-action {{
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
+            padding: 6px 13px;
             border-radius: 8px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-secondary);
             background: #f1f5f9;
             border: 1px solid var(--border-subtle);
@@ -461,11 +551,15 @@ component_html = f"""
             font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 8px;
+        }}
+
+        .section-label i {{
+            font-size: 13px;
         }}
 
         .section-tag {{
@@ -473,6 +567,9 @@ component_html = f"""
             padding: 2px 8px;
             border-radius: 9999px;
             font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }}
 
         .tag-comp {{
@@ -490,7 +587,7 @@ component_html = f"""
         /* Suggestion Grid / Cards */
         .cards-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 12px;
         }}
 
@@ -507,6 +604,7 @@ component_html = f"""
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
         }}
 
         .sugg-card:hover {{
@@ -524,6 +622,22 @@ component_html = f"""
         .sugg-card.top-rank:hover {{
             border-color: var(--primary);
             box-shadow: var(--shadow-hover);
+        }}
+
+        /* Mini progress bar on bottom of card */
+        .card-progress-bar {{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2.5px;
+            background: transparent;
+            width: 100%;
+        }}
+
+        .card-progress-fill {{
+            height: 100%;
+            border-radius: 0 2px 2px 0;
+            transition: width 0.3s ease;
         }}
 
         .sugg-info {{
@@ -563,7 +677,7 @@ component_html = f"""
             gap: 6px;
             font-size: 11px;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
         }}
 
         .model-tier-badge {{
@@ -574,6 +688,9 @@ component_html = f"""
             background: #f1f5f9;
             color: #475569;
             border: 1px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }}
 
         [data-theme="dark"] .model-tier-badge {{
@@ -631,24 +748,31 @@ component_html = f"""
             top: 6px;
             right: 6px;
             font-size: 9.5px;
-            padding: 1px 5px;
+            padding: 1px 6px;
             border-radius: 4px;
             background: rgba(79, 70, 229, 0.1);
             color: var(--primary);
             border: 1px solid rgba(79, 70, 229, 0.25);
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }}
 
         /* Empty state */
         .empty-sugg {{
-            padding: 16px;
+            padding: 18px;
             text-align: center;
             color: var(--text-muted);
             font-size: 13px;
             background: #f8fafc;
             border: 1.5px dashed var(--border-subtle);
             border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }}
 
         [data-theme="dark"] .empty-sugg {{
@@ -668,10 +792,13 @@ component_html = f"""
             font-size: 12.5px;
             font-weight: 700;
             color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }}
 
         .chip {{
-            padding: 5px 12px;
+            padding: 5px 13px;
             background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: 9999px;
@@ -681,6 +808,9 @@ component_html = f"""
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
             transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }}
 
         [data-theme="dark"] .chip {{
@@ -754,6 +884,9 @@ component_html = f"""
             transition: all 0.25s ease;
             pointer-events: none;
             z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }}
 
         .toast.show {{
@@ -767,10 +900,13 @@ component_html = f"""
         <!-- Header with mode switcher & theme toggle -->
         <div class="header-bar">
             <div class="title-badge-group">
-                <div class="main-title">Clavier Intelligent</div>
+                <div class="main-title">
+                    <i class="fa-solid fa-keyboard"></i>
+                    Clavier Intelligent
+                </div>
                 <div class="status-pill">
                     <div class="status-dot"></div>
-                    <span id="latencyDisplay">En direct • 0.8 ms</span>
+                    <span id="latencyDisplay"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> En direct • 0.8 ms</span>
                 </div>
             </div>
 
@@ -778,44 +914,59 @@ component_html = f"""
                 <!-- Mode Toggle -->
                 <div class="mode-toggle">
                     <button class="tab-btn active" id="tabUnified" onclick="switchMode('unified')">
-                        ⚡ Mode Tout-en-Un (Recommandé)
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Mode Tout-en-Un
                     </button>
                     <button class="tab-btn" id="tabDual" onclick="switchMode('dual')">
-                        🎛️ Mode Deux Entrées
+                        <i class="fa-solid fa-table-columns"></i> Mode Deux Entrées
                     </button>
                 </div>
 
                 <!-- Theme Toggle Button -->
                 <button class="btn-theme" id="themeBtn" onclick="toggleTheme()">
-                    🌙 Sombre
+                    <i class="fa-solid fa-moon"></i> Sombre
                 </button>
             </div>
         </div>
 
         <!-- MODE 1: UNIFIED ALL-IN-ONE (RECOMMENDED) -->
         <div id="viewUnified" class="card">
-            <div class="input-container">
+            <!-- Context Flow Visualization Bar -->
+            <div class="context-flow-bar" id="contextFlowBar">
+                <span style="font-weight:700;"><i class="fa-solid fa-timeline" style="color:var(--primary);"></i> Contexte actif :</span>
+                <span id="contextChipsWrapper">
+                    <span class="context-chip">le</span>
+                    <span class="context-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                    <span class="context-chip">film</span>
+                    <span class="context-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                    <span class="context-chip">est</span>
+                </span>
+            </div>
+
+            <!-- Input Box with Left Icon & Character Counter -->
+            <div class="input-wrapper">
+                <i class="fa-solid fa-pen-nib input-icon-left"></i>
                 <input 
                     type="text" 
                     id="unifiedInput" 
                     class="input-box" 
                     value="le film est mag" 
-                    placeholder="Tapez votre phrase sans appuyer sur Entrée..." 
+                    placeholder="Tapez votre phrase en direct..." 
                     autocomplete="off" 
                     spellcheck="false"
                 >
+                <div class="input-counter" id="inputCounter">4 mots • 15 car.</div>
             </div>
 
             <!-- Shortcuts and Action Toolbar -->
             <div class="toolbar">
                 <div class="shortcuts-group">
-                    <span class="shortcut-item"><kbd>⇥ Tab</kbd> Compléter mot</span>
-                    <span class="shortcut-item"><kbd>→</kbd> Mot suivant</span>
-                    <span class="shortcut-item"><kbd>Clic</kbd> Insérer</span>
+                    <span class="shortcut-item"><kbd><i class="fa-solid fa-arrow-right-to-bracket" style="font-size:10px;"></i> Tab</kbd> Compléter mot</span>
+                    <span class="shortcut-item"><kbd><i class="fa-solid fa-arrow-right" style="font-size:10px;"></i></kbd> Mot suivant</span>
+                    <span class="shortcut-item"><kbd><i class="fa-solid fa-mouse-pointer" style="font-size:10px;"></i> Clic</kbd> Insérer</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn-action" onclick="copyUnifiedText()">📋 Copier</button>
-                    <button class="btn-action" onclick="clearUnifiedText()">🗑️ Effacer</button>
+                    <button class="btn-action" onclick="copyUnifiedText()"><i class="fa-regular fa-copy"></i> Copier</button>
+                    <button class="btn-action" onclick="clearUnifiedText()"><i class="fa-solid fa-arrow-rotate-left"></i> Effacer</button>
                 </div>
             </div>
 
@@ -823,8 +974,11 @@ component_html = f"""
             <div class="suggestion-section">
                 <div class="section-header">
                     <span class="section-label">
+                        <i class="fa-solid fa-spell-check" style="color:var(--primary);"></i>
                         Complétion du mot actuel
-                        <span class="section-tag tag-comp" id="compPrefixTag">PRÉFIXE: MAG</span>
+                        <span class="section-tag tag-comp" id="compPrefixTag">
+                            <i class="fa-solid fa-font"></i> PRÉFIXE: MAG
+                        </span>
                     </span>
                     <span id="compHint" style="font-size:11.5px; color:var(--text-muted);">
                         Appuyez sur <kbd>Tab</kbd> pour le mot #1
@@ -839,8 +993,11 @@ component_html = f"""
             <div class="suggestion-section">
                 <div class="section-header">
                     <span class="section-label">
+                        <i class="fa-solid fa-crystal-ball" style="color:var(--emerald);"></i>
                         Prédiction du mot suivant
-                        <span class="section-tag tag-next" id="nextModelTag">MODÈLE: 3-GRAM</span>
+                        <span class="section-tag tag-next" id="nextModelTag">
+                            <i class="fa-solid fa-layer-group"></i> MODÈLE: 3-GRAM
+                        </span>
                     </span>
                     <span id="nextHint" style="font-size:11.5px; color:var(--text-muted);">
                         Appuyez sur <kbd>→</kbd> pour insérer
@@ -853,12 +1010,12 @@ component_html = f"""
 
             <!-- Preset prompts -->
             <div class="presets-bar">
-                <span class="preset-title">Exemples :</span>
-                <span class="chip" onclick="setPreset('le film est')">le film est</span>
-                <span class="chip" onclick="setPreset('j\\'ai adoré ce')">j'ai adoré ce</span>
-                <span class="chip" onclick="setPreset('les acteurs jouent')">les acteurs jouent</span>
-                <span class="chip" onclick="setPreset('une très belle')">une très belle</span>
-                <span class="chip" onclick="setPreset('je ne recommande pas')">je ne recommande pas</span>
+                <span class="preset-title"><i class="fa-regular fa-lightbulb"></i> Exemples :</span>
+                <span class="chip" onclick="setPreset('le film est')"><i class="fa-solid fa-film" style="color:#6366f1; font-size:10px;"></i> le film est</span>
+                <span class="chip" onclick="setPreset('j\\'ai adoré ce')"><i class="fa-solid fa-heart" style="color:#ef4444; font-size:10px;"></i> j'ai adoré ce</span>
+                <span class="chip" onclick="setPreset('les acteurs jouent')"><i class="fa-solid fa-masks-theater" style="color:#f59e0b; font-size:10px;"></i> les acteurs jouent</span>
+                <span class="chip" onclick="setPreset('une très belle')"><i class="fa-solid fa-sparkles" style="color:#10b981; font-size:10px;"></i> une très belle</span>
+                <span class="chip" onclick="setPreset('je ne recommande pas')"><i class="fa-solid fa-thumbs-down" style="color:#64748b; font-size:10px;"></i> je ne recommande pas</span>
             </div>
         </div>
 
@@ -868,18 +1025,21 @@ component_html = f"""
                 <!-- Box 1: Complétion de mot -->
                 <div class="dual-box-card">
                     <div class="dual-box-title">
-                        <span>1. Compléteur de mot actuel</span>
+                        <span><i class="fa-solid fa-spell-check" style="color:var(--primary);"></i> 1. Compléteur de mot actuel</span>
                         <span class="section-tag tag-comp"><kbd>Tab</kbd> Valider</span>
                     </div>
-                    <input 
-                        type="text" 
-                        id="dualCompInput" 
-                        class="input-box" 
-                        value="mag" 
-                        placeholder="Tapez un préfixe (ex: mag, act, cin)..." 
-                        autocomplete="off" 
-                        spellcheck="false"
-                    >
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-font input-icon-left"></i>
+                        <input 
+                            type="text" 
+                            id="dualCompInput" 
+                            class="input-box" 
+                            value="mag" 
+                            placeholder="Tapez un préfixe (ex: mag, act, cin)..." 
+                            autocomplete="off" 
+                            spellcheck="false"
+                        >
+                    </div>
                     <div class="cards-grid" id="dualCompCardsGrid" style="grid-template-columns: 1fr;">
                         <!-- Dynamically filled -->
                     </div>
@@ -888,18 +1048,21 @@ component_html = f"""
                 <!-- Box 2: Mot suivant -->
                 <div class="dual-box-card">
                     <div class="dual-box-title">
-                        <span>2. Prédicteur de mot suivant</span>
+                        <span><i class="fa-solid fa-crystal-ball" style="color:var(--emerald);"></i> 2. Prédicteur de mot suivant</span>
                         <span class="section-tag tag-next"><kbd>→</kbd> Insérer</span>
                     </div>
-                    <input 
-                        type="text" 
-                        id="dualNextInput" 
-                        class="input-box" 
-                        value="le film est " 
-                        placeholder="Tapez le début de la phrase..." 
-                        autocomplete="off" 
-                        spellcheck="false"
-                    >
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-forward-step input-icon-left"></i>
+                        <input 
+                            type="text" 
+                            id="dualNextInput" 
+                            class="input-box" 
+                            value="le film est " 
+                            placeholder="Tapez le début de la phrase..." 
+                            autocomplete="off" 
+                            spellcheck="false"
+                        >
+                    </div>
                     <div class="cards-grid" id="dualNextCardsGrid" style="grid-template-columns: 1fr;">
                         <!-- Dynamically filled -->
                     </div>
@@ -908,7 +1071,10 @@ component_html = f"""
         </div>
 
         <!-- Toast notification -->
-        <div id="toast" class="toast">Texte copié dans le presse-papier !</div>
+        <div id="toast" class="toast">
+            <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
+            Texte copié dans le presse-papier !
+        </div>
     </div>
 
     <script>
@@ -921,13 +1087,35 @@ component_html = f"""
         const dualCompInput = document.getElementById('dualCompInput');
         const dualNextInput = document.getElementById('dualNextInput');
         const themeBtn = document.getElementById('themeBtn');
+        const inputCounter = document.getElementById('inputCounter');
+        const contextChipsWrapper = document.getElementById('contextChipsWrapper');
+
+        function updateCounter(text) {{
+            const words = text.trim() ? text.trim().split(/\\s+/).length : 0;
+            const chars = text.length;
+            inputCounter.textContent = `${{words}} mot${{words > 1 ? 's' : ''}} • ${{chars}} car.`;
+        }}
+
+        function updateContextFlow(words) {{
+            if (!words || words.length === 0) {{
+                contextChipsWrapper.innerHTML = '<span style="color:var(--text-muted); font-style:italic;">Début de phrase</span>';
+                return;
+            }}
+            const recent = words.slice(-4);
+            contextChipsWrapper.innerHTML = recent.map((w, idx) => {{
+                return `
+                    <span class="context-chip">${{w}}</span>
+                    ${{idx < recent.length - 1 ? '<span class="context-arrow"><i class="fa-solid fa-chevron-right"></i></span>' : ''}}
+                `;
+            }}).join('');
+        }}
 
         // Theme Toggle (Default is LIGHT)
         function toggleTheme() {{
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
-            themeBtn.textContent = newTheme === 'light' ? '🌙 Sombre' : '☀️ Clair';
+            themeBtn.innerHTML = newTheme === 'light' ? '<i class="fa-solid fa-moon"></i> Sombre' : '<i class="fa-solid fa-sun"></i> Clair';
             if (latestCompletions || latestNextWords) {{
                 fetchSuggestions(currentMode === 'unified' ? unifiedInput.value : dualCompInput.value, currentMode);
             }}
@@ -962,12 +1150,14 @@ component_html = f"""
                 const data = await res.json();
 
                 if (data.latency_ms !== undefined) {{
-                    document.getElementById('latencyDisplay').textContent = `En direct • ${{data.latency_ms}} ms`;
+                    document.getElementById('latencyDisplay').innerHTML = `<i class="fa-solid fa-bolt" style="font-size:10px;"></i> En direct • ${{data.latency_ms}} ms`;
                 }}
 
                 if (target === 'unified') {{
                     latestCompletions = data.completions || [];
                     latestNextWords = data.next_words || [];
+                    updateCounter(text);
+                    updateContextFlow(data.context_words);
                     renderUnifiedUI(data);
                 }} else if (target === 'dual-comp') {{
                     latestCompletions = data.completions || [];
@@ -1003,20 +1193,20 @@ component_html = f"""
 
             // 1. Render Completions
             if (data.current_prefix) {{
-                compPrefixTag.textContent = `PRÉFIXE: "${{data.current_prefix.toUpperCase()}}"`;
+                compPrefixTag.innerHTML = `<i class="fa-solid fa-font"></i> PRÉFIXE: "${{data.current_prefix.toUpperCase()}}"`;
             }} else {{
-                compPrefixTag.textContent = `MOT TERMINÉ`;
+                compPrefixTag.innerHTML = `<i class="fa-solid fa-check"></i> MOT TERMINÉ`;
             }}
 
             if (!data.completions || data.completions.length === 0) {{
-                compGrid.innerHTML = `<div class="empty-sugg">Aucune complétion disponible pour "${{data.current_prefix || 'ce mot'}}". Continuez la frappe ou faites un espace.</div>`;
+                compGrid.innerHTML = `<div class="empty-sugg"><i class="fa-regular fa-circle-question"></i> Aucune complétion pour "${{data.current_prefix || 'ce mot'}}". Continuez la frappe ou faites un espace.</div>`;
             }} else {{
                 compGrid.innerHTML = data.completions.map((item, idx) => {{
                     const isTop = idx === 0;
                     const strokeColor = item.norm_score >= 50 ? '#4f46e5' : (item.norm_score >= 25 ? '#059669' : '#d97706');
                     return `
                         <div class="sugg-card ${{isTop ? 'top-rank' : ''}}" onclick="applyCompletion('${{item.word}}')">
-                            ${{isTop ? '<span class="card-shortcut-hint">⇥ Tab</span>' : ''}}
+                            ${{isTop ? '<span class="card-shortcut-hint"><i class="fa-solid fa-star" style="color:#f59e0b; font-size:9px;"></i> ⇥ Tab</span>' : ''}}
                             <div class="sugg-info">
                                 <div class="sugg-word-row">
                                     <span class="sugg-word">
@@ -1024,20 +1214,23 @@ component_html = f"""
                                     </span>
                                 </div>
                                 <div class="sugg-meta">
-                                    <span class="model-tier-badge">${{item.source}}</span>
+                                    <span class="model-tier-badge"><i class="fa-solid fa-layer-group" style="font-size:9px;"></i> ${{item.source}}</span>
                                     <span>P=${{(item.prob * 100).toFixed(2)}}%</span>
                                 </div>
                             </div>
                             ${{renderRadialGauge(item.norm_score, strokeColor)}}
+                            <div class="card-progress-bar">
+                                <div class="card-progress-fill" style="width: ${{item.norm_score}}%; background: ${{strokeColor}};"></div>
+                            </div>
                         </div>
                     `;
                 }}).join('');
             }}
 
             // 2. Render Next Word Predictions
-            nextModelTag.textContent = `MODÈLE: ${{data.order.toUpperCase()}}`;
+            nextModelTag.innerHTML = `<i class="fa-solid fa-brain"></i> MODÈLE: ${{data.order.toUpperCase()}}`;
             if (!data.next_words || data.next_words.length === 0) {{
-                nextGrid.innerHTML = `<div class="empty-sugg">Tapez au moins un mot pour obtenir les prédictions contextuelles.</div>`;
+                nextGrid.innerHTML = `<div class="empty-sugg"><i class="fa-solid fa-circle-info"></i> Tapez au moins un mot pour obtenir les prédictions contextuelles.</div>`;
             }} else {{
                 nextGrid.innerHTML = data.next_words.map((item, idx) => {{
                     const isTop = idx === 0;
@@ -1045,19 +1238,22 @@ component_html = f"""
                     const displayLabel = item.is_eos ? 'Fin de phrase ↵' : item.display;
                     return `
                         <div class="sugg-card ${{isTop ? 'top-rank' : ''}}" onclick="applyNextWord('${{item.is_eos ? '.' : item.word}}')">
-                            ${{isTop ? '<span class="card-shortcut-hint">→ Flèche</span>' : ''}}
+                            ${{isTop ? '<span class="card-shortcut-hint"><i class="fa-solid fa-star" style="color:#f59e0b; font-size:9px;"></i> → Flèche</span>' : ''}}
                             <div class="sugg-info">
                                 <div class="sugg-word-row">
                                     <span class="sugg-word" style="${{item.is_eos ? 'color:#d97706; font-style:italic;' : ''}}">
-                                        ${{displayLabel}}
+                                        ${{item.is_eos ? '<i class="fa-solid fa-arrow-turn-down" style="font-size:12px; margin-right:4px;"></i>' : ''}} ${{displayLabel}}
                                     </span>
                                 </div>
                                 <div class="sugg-meta">
-                                    <span class="model-tier-badge">${{item.source}}</span>
+                                    <span class="model-tier-badge"><i class="fa-solid fa-layer-group" style="font-size:9px;"></i> ${{item.source}}</span>
                                     <span>P=${{(item.prob * 100).toFixed(2)}}%</span>
                                 </div>
                             </div>
                             ${{renderRadialGauge(item.norm_score, strokeColor)}}
+                            <div class="card-progress-bar">
+                                <div class="card-progress-fill" style="width: ${{item.norm_score}}%; background: ${{strokeColor}};"></div>
+                            </div>
                         </div>
                     `;
                 }}).join('');
@@ -1068,14 +1264,14 @@ component_html = f"""
         function renderDualCompUI(data) {{
             const grid = document.getElementById('dualCompCardsGrid');
             if (!data.completions || data.completions.length === 0) {{
-                grid.innerHTML = `<div class="empty-sugg">Aucune complétion pour "${{data.current_prefix || 'ce préfixe'}}".</div>`;
+                grid.innerHTML = `<div class="empty-sugg"><i class="fa-regular fa-circle-question"></i> Aucune complétion pour "${{data.current_prefix || 'ce préfixe'}}".</div>`;
                 return;
             }}
             grid.innerHTML = data.completions.map((item, idx) => {{
                 const isTop = idx === 0;
                 return `
                     <div class="sugg-card ${{isTop ? 'top-rank' : ''}}" onclick="applyDualComp('${{item.word}}')">
-                        ${{isTop ? '<span class="card-shortcut-hint">⇥ Tab</span>' : ''}}
+                        ${{isTop ? '<span class="card-shortcut-hint"><i class="fa-solid fa-star" style="color:#f59e0b; font-size:9px;"></i> ⇥ Tab</span>' : ''}}
                         <div class="sugg-info">
                             <span class="sugg-word">
                                 <span class="match-prefix">${{item.prefix}}</span>${{item.suffix}}
@@ -1092,14 +1288,14 @@ component_html = f"""
         function renderDualNextUI(data) {{
             const grid = document.getElementById('dualNextCardsGrid');
             if (!data.next_words || data.next_words.length === 0) {{
-                grid.innerHTML = `<div class="empty-sugg">Entrez des mots pour voir les prédictions suivantes.</div>`;
+                grid.innerHTML = `<div class="empty-sugg"><i class="fa-solid fa-circle-info"></i> Entrez des mots pour voir les prédictions suivantes.</div>`;
                 return;
             }}
             grid.innerHTML = data.next_words.map((item, idx) => {{
                 const isTop = idx === 0;
                 return `
                     <div class="sugg-card ${{isTop ? 'top-rank' : ''}}" onclick="applyDualNext('${{item.is_eos ? '.' : item.word}}')">
-                        ${{isTop ? '<span class="card-shortcut-hint">→ Flèche</span>' : ''}}
+                        ${{isTop ? '<span class="card-shortcut-hint"><i class="fa-solid fa-star" style="color:#f59e0b; font-size:9px;"></i> → Flèche</span>' : ''}}
                         <div class="sugg-info">
                             <span class="sugg-word">${{item.is_eos ? 'Fin de phrase ↵' : item.display}}</span>
                             <span class="sugg-meta">${{item.source}} • P=${{(item.prob * 100).toFixed(2)}}%</span>
@@ -1236,4 +1432,4 @@ component_html = f"""
 """
 
 # Render the interactive UI inside Streamlit
-components.html(component_html, height=720, scrolling=False)
+components.html(component_html, height=760, scrolling=False)
