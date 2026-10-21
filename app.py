@@ -1,4 +1,4 @@
-"""Lab 02 - Smart Keyboard V1 (Hostinger/Paddle SaaS UI).
+"""Lab 02 - Smart Keyboard V1 (Hostinger/Paddle SaaS Light UI).
 Run:  streamlit run app.py
 """
 import streamlit as st
@@ -14,37 +14,45 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Global CSS for Streamlit container
+# Custom Global CSS for Streamlit Light Theme
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .stApp {
-        background-color: #0b0f19;
-        color: #f1f5f9;
+        background-color: #f8fafc;
+        color: #0f172a;
     }
     header[data-testid="stHeader"] {
         background-color: transparent !important;
     }
     section[data-testid="stSidebar"] {
-        background-color: #0d121f !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.07);
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0;
     }
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 1.2rem !important;
         padding-bottom: 2rem !important;
         max-width: 1200px;
+    }
+    /* Streamlit widgets styling for light mode */
+    div[data-testid="stMetricValue"] {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #64748b !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
 @st.cache_resource
-def get_models(num_docs=2000, k=0.1):
-    """Charge les données et entraîne les modèles n-grammes."""
+def get_models(num_docs=1000, k=0.1):
+    """Charge les données et entraîne les modèles n-grammes de façon ultra-légère et rapide."""
     docs = load_documents(num_docs=num_docs)
     sentences = [s for d in docs.values() for s in d]
     tri = NGramModel(sentences, 3, k)
@@ -53,23 +61,23 @@ def get_models(num_docs=2000, k=0.1):
     return (tri, bi, uni), sentences, docs
 
 
-# Sidebar Controls & Analytics
+# Sidebar Controls & Analytics (Clean Light Design)
 with st.sidebar:
     st.markdown("""
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-        <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow: 0 4px 12px rgba(99,102,241,0.35);">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <div style="background: linear-gradient(135deg, #4f46e5, #6366f1); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow: 0 4px 12px rgba(79,70,229,0.25);">
             ⌨️
         </div>
         <div>
-            <div style="font-size:16px; font-weight:700; color:#fff;">Smart Keyboard</div>
-            <div style="font-size:12px; color:#94a3b8;">NLP Lab 02 • v1.2</div>
+            <div style="font-size:16px; font-weight:800; color:#0f172a; letter-spacing:-0.01em;">Smart Keyboard</div>
+            <div style="font-size:12px; font-weight:600; color:#64748b;">NLP Lab 02 • Light & Fast</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<hr style='border:none; border-top:1px solid rgba(255,255,255,0.08); margin:12px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border:none; border-top:1px solid #e2e8f0; margin:12px 0;'>", unsafe_allow_html=True)
 
-    st.markdown("<div style='font-size:13px; font-weight:600; color:#cbd5e1; margin-bottom:6px;'>Paramètres du modèle</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:13px; font-weight:700; color:#1e293b; margin-bottom:6px;'>Paramètres du modèle</div>", unsafe_allow_html=True)
     smoothing_k = st.select_slider(
         "Lissage add-k (k)",
         options=[0.01, 0.05, 0.1, 0.2, 0.5, 1.0],
@@ -80,16 +88,16 @@ with st.sidebar:
         "Documents d'entraînement (Allociné)",
         min_value=500,
         max_value=3000,
-        value=2000,
+        value=1000,
         step=500,
-        help="Nombre de critiques de films chargées pour constituer le corpus."
+        help="Nombre de critiques de films chargées (1000 pour une exécution légère et rapide)."
     )
 
     (tri, bi, uni), sentences, docs = get_models(num_docs=docs_limit, k=smoothing_k)
     port = start_suggestion_server(tri, bi, uni)
 
-    st.markdown("<hr style='border:none; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;'>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:13px; font-weight:600; color:#cbd5e1; margin-bottom:8px;'>Statistiques du Corpus</div>", unsafe_allow_html=True)
+    st.markdown("<hr style='border:none; border-top:1px solid #e2e8f0; margin:16px 0;'>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:13px; font-weight:700; color:#1e293b; margin-bottom:8px;'>Statistiques du Corpus</div>", unsafe_allow_html=True)
     
     col_a, col_b = st.columns(2)
     with col_a:
@@ -100,35 +108,65 @@ with st.sidebar:
         st.metric("Trigrammes", f"{len(tri.ctx_counts):,}")
 
     st.markdown("""
-    <div style="background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 12px; margin-top: 15px;">
-        <div style="font-size:12px; font-weight:600; color:#818cf8; margin-bottom:4px;">⚡ Raccourcis Clavier</div>
-        <div style="font-size:12px; color:#94a3b8; line-height:1.6;">
-            • <kbd style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; color:#fff;">Tab</kbd> : Compléter mot en cours<br>
-            • <kbd style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; color:#fff;">→</kbd> : Insérer mot suivant<br>
-            • <kbd style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; color:#fff;">Clic</kbd> : Insérer une suggestion
+    <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 18px;">
+        <div style="font-size:12px; font-weight:700; color:#4f46e5; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">⚡ Raccourcis Clavier</div>
+        <div style="font-size:12.5px; color:#475569; line-height:1.7;">
+            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:600; color:#0f172a;">Tab ⇥</kbd> : Compléter le mot en cours<br>
+            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:600; color:#0f172a;">→ Flèche</kbd> : Insérer le mot suivant<br>
+            • <kbd style="background:#ffffff; border:1px solid #cbd5e1; border-bottom:2px solid #94a3b8; padding:2px 6px; border-radius:5px; font-weight:600; color:#0f172a;">Clic</kbd> : Insérer une suggestion
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 
-# Generate the Modern Hostinger/Paddle Component HTML
+# Generate the Light Paddle / Hostinger Component HTML
 component_html = f"""
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Keyboard Component</title>
+    <title>Smart Keyboard Light Component</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* LIGHT THEME (DEFAULT - PADDLE & HOSTINGER SAAS STYLE) */
         :root {{
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
+            --bg-card-top: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
+            --bg-input: #ffffff;
+            --border-subtle: #e2e8f0;
+            --border-card-top: #c7d2fe;
+            --border-active: #4f46e5;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --emerald: #059669;
+            --emerald-bg: rgba(16, 185, 129, 0.1);
+            --amber: #d97706;
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(79, 70, 229, 0.1), 0 4px 6px -4px rgba(79, 70, 229, 0.05);
+            --kbd-bg: #f8fafc;
+            --kbd-border: #cbd5e1;
+            --kbd-border-b: #94a3b8;
+            --kbd-text: #1e293b;
+        }}
+
+        /* DARK THEME (OPTIONAL TOGGLE) */
+        [data-theme="dark"] {{
             --bg-page: #0b0f19;
             --bg-card: #111827;
             --bg-card-hover: #172136;
+            --bg-card-top: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%);
             --bg-input: #0d1322;
             --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-card-top: rgba(99, 102, 241, 0.35);
             --border-active: #6366f1;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
@@ -137,9 +175,14 @@ component_html = f"""
             --primary-light: #818cf8;
             --primary-glow: rgba(99, 102, 241, 0.25);
             --emerald: #10b981;
-            --emerald-glow: rgba(16, 185, 129, 0.25);
+            --emerald-bg: rgba(16, 185, 129, 0.15);
             --amber: #f59e0b;
-            --cyan: #06b6d4;
+            --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 6px 20px -4px rgba(99, 102, 241, 0.25);
+            --kbd-bg: rgba(255, 255, 255, 0.08);
+            --kbd-border: rgba(255, 255, 255, 0.16);
+            --kbd-border-b: rgba(255, 255, 255, 0.25);
+            --kbd-text: #e2e8f0;
         }}
 
         * {{
@@ -147,6 +190,7 @@ component_html = f"""
             margin: 0;
             padding: 0;
             user-select: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }}
 
         body {{
@@ -160,7 +204,7 @@ component_html = f"""
         .wrapper {{
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
             max-width: 100%;
         }}
 
@@ -171,7 +215,7 @@ component_html = f"""
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
-            padding: 4px 2px;
+            padding: 2px 0;
         }}
 
         .title-badge-group {{
@@ -181,12 +225,10 @@ component_html = f"""
         }}
 
         .main-title {{
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 800;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
         }}
 
         .status-pill {{
@@ -194,20 +236,20 @@ component_html = f"""
             align-items: center;
             gap: 6px;
             padding: 4px 10px;
-            background: rgba(16, 185, 129, 0.1);
+            background: var(--emerald-bg);
             border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 9999px;
             font-size: 11px;
-            font-weight: 600;
-            color: #34d399;
+            font-weight: 700;
+            color: var(--emerald);
         }}
 
         .status-dot {{
             width: 7px;
             height: 7px;
             border-radius: 50%;
-            background-color: #10b981;
-            box-shadow: 0 0 8px #10b981;
+            background-color: var(--emerald);
+            box-shadow: 0 0 6px var(--emerald);
             animation: pulse 2s infinite;
         }}
 
@@ -217,18 +259,50 @@ component_html = f"""
             100% {{ transform: scale(0.95); opacity: 0.8; }}
         }}
 
-        /* Mode Switcher Tabs (Hostinger/Paddle pill toggle) */
+        /* Controls right side */
+        .header-right {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+
+        /* Theme toggle button */
+        .btn-theme {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }}
+
+        .btn-theme:hover {{
+            color: var(--text-primary);
+            border-color: #cbd5e1;
+        }}
+
+        /* Mode Switcher Tabs (Paddle/Hostinger modern pill toggle) */
         .mode-toggle {{
             display: inline-flex;
-            background: rgba(255, 255, 255, 0.04);
+            background: #f1f5f9;
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            padding: 4px;
+            padding: 3px;
             gap: 4px;
         }}
 
+        [data-theme="dark"] .mode-toggle {{
+            background: rgba(255, 255, 255, 0.04);
+        }}
+
         .tab-btn {{
-            padding: 7px 16px;
+            padding: 6px 14px;
             border-radius: 8px;
             font-size: 12.5px;
             font-weight: 600;
@@ -236,38 +310,42 @@ component_html = f"""
             background: transparent;
             border: none;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
         }}
 
         .tab-btn.active {{
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+        }}
+
+        [data-theme="dark"] .tab-btn.active {{
             background: #1e293b;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            color: #ffffff;
         }}
 
         .tab-btn:hover:not(.active) {{
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.03);
         }}
 
         /* Main Card Container */
         .card {{
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 18px;
-            padding: 22px;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow-card);
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
             position: relative;
-            backdrop-filter: blur(12px);
         }}
 
-        /* Input Area with Ghost Overlay */
+        /* Input Box */
         .input-container {{
             position: relative;
             width: 100%;
@@ -276,51 +354,31 @@ component_html = f"""
         .input-box {{
             width: 100%;
             background: var(--bg-input);
-            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border: 1.5px solid var(--border-subtle);
             border-radius: 14px;
             padding: 16px 18px;
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 16.5px;
+            font-weight: 500;
             line-height: 1.5;
             color: var(--text-primary);
             outline: none;
             transition: all 0.2s ease;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
             user-select: text;
         }}
 
         .input-box:focus {{
             border-color: var(--border-active);
-            box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 4px rgba(0, 0, 0, 0.3);
-            background: #0f172a;
+            box-shadow: 0 0 0 3px var(--primary-glow);
         }}
 
         .input-box::placeholder {{
             color: var(--text-muted);
+            font-weight: 400;
         }}
 
-        /* Inline Ghost Text Preview */
-        .ghost-preview {{
-            position: absolute;
-            left: 18px;
-            top: 17px;
-            font-size: 16.5px;
-            line-height: 1.5;
-            pointer-events: none;
-            color: transparent;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            z-index: 2;
-        }}
-
-        .ghost-completion {{
-            color: rgba(148, 163, 184, 0.55);
-            font-weight: 500;
-            border-bottom: 1.5px dashed rgba(99, 102, 241, 0.6);
-            margin-left: 1px;
-        }}
-
-        /* Shortcut Bar & Actions */
+        /* Toolbar */
         .toolbar {{
             display: flex;
             justify-content: space-between;
@@ -341,21 +399,21 @@ component_html = f"""
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
+            font-size: 12.5px;
             color: var(--text-secondary);
         }}
 
         kbd {{
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-bottom-width: 2px;
+            background: var(--kbd-bg);
+            border: 1px solid var(--kbd-border);
+            border-bottom: 2px solid var(--kbd-border-b);
             border-radius: 6px;
-            padding: 2px 6px;
+            padding: 2px 7px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
-            font-weight: 600;
-            color: #e2e8f0;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+            color: var(--kbd-text);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }}
 
         .btn-action {{
@@ -367,15 +425,23 @@ component_html = f"""
             font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
+            background: #f1f5f9;
             border: 1px solid var(--border-subtle);
             cursor: pointer;
             transition: all 0.15s ease;
         }}
 
+        [data-theme="dark"] .btn-action {{
+            background: rgba(255, 255, 255, 0.05);
+        }}
+
         .btn-action:hover {{
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }}
+
+        [data-theme="dark"] .btn-action:hover {{
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
         }}
 
         /* Suggestion Section & Ribbons */
@@ -393,7 +459,7 @@ component_html = f"""
 
         .section-label {{
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: var(--text-secondary);
@@ -403,36 +469,36 @@ component_html = f"""
         }}
 
         .section-tag {{
-            font-size: 10px;
-            padding: 2px 7px;
+            font-size: 10.5px;
+            padding: 2px 8px;
             border-radius: 9999px;
             font-weight: 700;
         }}
 
         .tag-comp {{
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+            border: 1px solid rgba(79, 70, 229, 0.2);
         }}
 
         .tag-next {{
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
+            background: var(--emerald-bg);
+            color: var(--emerald);
             border: 1px solid rgba(16, 185, 129, 0.3);
         }}
 
         /* Suggestion Grid / Cards */
         .cards-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
             gap: 12px;
         }}
 
         .sugg-card {{
-            background: rgba(255, 255, 255, 0.025);
+            background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 14px;
+            padding: 13px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -440,30 +506,30 @@ component_html = f"""
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
         }}
 
         .sugg-card:hover {{
             background: var(--bg-card-hover);
-            border-color: rgba(99, 102, 241, 0.4);
+            border-color: #cbd5e1;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.4);
+            box-shadow: var(--shadow-hover);
         }}
 
         .sugg-card.top-rank {{
-            border-color: rgba(99, 102, 241, 0.35);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%);
+            background: var(--bg-card-top);
+            border-color: var(--border-card-top);
         }}
 
         .sugg-card.top-rank:hover {{
             border-color: var(--primary);
-            box-shadow: 0 6px 20px -4px var(--primary-glow);
+            box-shadow: var(--shadow-hover);
         }}
 
         .sugg-info {{
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
             min-width: 0;
         }}
 
@@ -474,21 +540,21 @@ component_html = f"""
         }}
 
         .sugg-word {{
-            font-size: 14.5px;
+            font-size: 15px;
             font-weight: 700;
-            color: #fff;
+            color: var(--text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }}
 
         .match-prefix {{
-            color: #818cf8;
+            color: var(--primary);
             font-weight: 800;
         }}
 
         .match-suffix {{
-            color: #f8fafc;
+            color: var(--text-primary);
         }}
 
         .sugg-meta {{
@@ -497,22 +563,30 @@ component_html = f"""
             gap: 6px;
             font-size: 11px;
             color: var(--text-muted);
+            font-weight: 500;
         }}
 
         .model-tier-badge {{
-            padding: 1px 5px;
+            padding: 1px 6px;
             border-radius: 4px;
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: 700;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }}
+
+        [data-theme="dark"] .model-tier-badge {{
             background: rgba(255, 255, 255, 0.06);
             color: #cbd5e1;
+            border-color: transparent;
         }}
 
         /* Creative Radial Gauge (Paddle style circular progress indicator) */
         .score-radial {{
             position: relative;
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -528,26 +602,26 @@ component_html = f"""
 
         .circle-bg {{
             fill: none;
-            stroke: rgba(255, 255, 255, 0.08);
+            stroke: #e2e8f0;
             stroke-width: 3.2;
+        }}
+
+        [data-theme="dark"] .circle-bg {{
+            stroke: rgba(255, 255, 255, 0.08);
         }}
 
         .circle {{
             fill: none;
-            stroke-width: 3.2;
+            stroke-width: 3.4;
             stroke-linecap: round;
-            transition: stroke-dasharray 0.4s ease;
+            transition: stroke-dasharray 0.3s ease;
         }}
-
-        .circle-indigo {{ stroke: #6366f1; }}
-        .circle-emerald {{ stroke: #10b981; }}
-        .circle-amber {{ stroke: #f59e0b; }}
 
         .score-inner-text {{
             position: absolute;
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 800;
-            color: #e2e8f0;
+            color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
         }}
 
@@ -556,12 +630,12 @@ component_html = f"""
             position: absolute;
             top: 6px;
             right: 6px;
-            font-size: 9px;
-            padding: 1px 4px;
+            font-size: 9.5px;
+            padding: 1px 5px;
             border-radius: 4px;
-            background: rgba(99, 102, 241, 0.2);
-            color: #c7d2fe;
-            border: 1px solid rgba(99, 102, 241, 0.4);
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(79, 70, 229, 0.25);
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
         }}
@@ -572,9 +646,13 @@ component_html = f"""
             text-align: center;
             color: var(--text-muted);
             font-size: 13px;
+            background: #f8fafc;
+            border: 1.5px dashed var(--border-subtle);
+            border-radius: 12px;
+        }}
+
+        [data-theme="dark"] .empty-sugg {{
             background: rgba(255, 255, 255, 0.015);
-            border: 1px dashed var(--border-subtle);
-            border-radius: 10px;
         }}
 
         /* Presets Chips */
@@ -587,28 +665,40 @@ component_html = f"""
         }}
 
         .preset-title {{
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 12.5px;
+            font-weight: 700;
             color: var(--text-muted);
         }}
 
         .chip {{
             padding: 5px 12px;
-            background: rgba(255, 255, 255, 0.04);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: 9999px;
             font-size: 12px;
-            font-weight: 500;
-            color: #cbd5e1;
+            font-weight: 600;
+            color: var(--text-secondary);
             cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
             transition: all 0.15s ease;
         }}
 
+        [data-theme="dark"] .chip {{
+            background: rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+        }}
+
         .chip:hover {{
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: var(--primary);
+            transform: translateY(-1px);
+        }}
+
+        [data-theme="dark"] .chip:hover {{
             background: rgba(99, 102, 241, 0.15);
             border-color: rgba(99, 102, 241, 0.4);
             color: #fff;
-            transform: translateY(-1px);
         }}
 
         /* DUAL INPUT MODE CONTAINER */
@@ -625,37 +715,40 @@ component_html = f"""
         }}
 
         .dual-box-card {{
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
             gap: 12px;
+        }}
+
+        [data-theme="dark"] .dual-box-card {{
+            background: rgba(255, 255, 255, 0.02);
         }}
 
         .dual-box-title {{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 700;
-            color: #e2e8f0;
+            color: var(--text-primary);
         }}
 
-        /* Notification toast */
+        /* Toast */
         .toast {{
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #1e293b;
+            background: #0f172a;
             color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 12.5px;
             font-weight: 600;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             opacity: 0;
             transform: translateY(10px);
             transition: all 0.25s ease;
@@ -671,7 +764,7 @@ component_html = f"""
 </head>
 <body>
     <div class="wrapper">
-        <!-- Header with mode switcher -->
+        <!-- Header with mode switcher & theme toggle -->
         <div class="header-bar">
             <div class="title-badge-group">
                 <div class="main-title">Clavier Intelligent</div>
@@ -681,13 +774,20 @@ component_html = f"""
                 </div>
             </div>
 
-            <!-- Tabs: Mode Unifié vs Mode Double Entrée -->
-            <div class="mode-toggle">
-                <button class="tab-btn active" id="tabUnified" onclick="switchMode('unified')">
-                    ⚡ Mode Tout-en-Un (Recommandé)
-                </button>
-                <button class="tab-btn" id="tabDual" onclick="switchMode('dual')">
-                    🎛️ Mode Deux Entrées
+            <div class="header-right">
+                <!-- Mode Toggle -->
+                <div class="mode-toggle">
+                    <button class="tab-btn active" id="tabUnified" onclick="switchMode('unified')">
+                        ⚡ Mode Tout-en-Un (Recommandé)
+                    </button>
+                    <button class="tab-btn" id="tabDual" onclick="switchMode('dual')">
+                        🎛️ Mode Deux Entrées
+                    </button>
+                </div>
+
+                <!-- Theme Toggle Button -->
+                <button class="btn-theme" id="themeBtn" onclick="toggleTheme()">
+                    🌙 Sombre
                 </button>
             </div>
         </div>
@@ -726,7 +826,7 @@ component_html = f"""
                         Complétion du mot actuel
                         <span class="section-tag tag-comp" id="compPrefixTag">PRÉFIXE: MAG</span>
                     </span>
-                    <span id="compHint" style="font-size:11px; color:var(--text-muted);">
+                    <span id="compHint" style="font-size:11.5px; color:var(--text-muted);">
                         Appuyez sur <kbd>Tab</kbd> pour le mot #1
                     </span>
                 </div>
@@ -742,7 +842,7 @@ component_html = f"""
                         Prédiction du mot suivant
                         <span class="section-tag tag-next" id="nextModelTag">MODÈLE: 3-GRAM</span>
                     </span>
-                    <span id="nextHint" style="font-size:11px; color:var(--text-muted);">
+                    <span id="nextHint" style="font-size:11.5px; color:var(--text-muted);">
                         Appuyez sur <kbd>→</kbd> pour insérer
                     </span>
                 </div>
@@ -816,11 +916,22 @@ component_html = f"""
         let currentMode = 'unified';
         let latestCompletions = [];
         let latestNextWords = [];
-        let debounceTimer = null;
 
         const unifiedInput = document.getElementById('unifiedInput');
         const dualCompInput = document.getElementById('dualCompInput');
         const dualNextInput = document.getElementById('dualNextInput');
+        const themeBtn = document.getElementById('themeBtn');
+
+        // Theme Toggle (Default is LIGHT)
+        function toggleTheme() {{
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeBtn.textContent = newTheme === 'light' ? '🌙 Sombre' : '☀️ Clair';
+            if (latestCompletions || latestNextWords) {{
+                fetchSuggestions(currentMode === 'unified' ? unifiedInput.value : dualCompInput.value, currentMode);
+            }}
+        }}
 
         // Mode Switching
         function switchMode(mode) {{
@@ -871,13 +982,12 @@ component_html = f"""
         }}
 
         // Render Circular Radial Score Indicator
-        function renderRadialGauge(score, colorClass) {{
-            const strokeColor = colorClass === 'circle-emerald' ? '#10b981' : (colorClass === 'circle-amber' ? '#f59e0b' : '#6366f1');
+        function renderRadialGauge(score, colorHex) {{
             return `
                 <div class="score-radial">
                     <svg viewBox="0 0 36 36" class="circular-chart">
                         <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                        <path class="circle" stroke="${{strokeColor}}" stroke-dasharray="${{Math.max(score, 5)}}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        <path class="circle" stroke="${{colorHex}}" stroke-dasharray="${{Math.max(score, 5)}}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
                     </svg>
                     <span class="score-inner-text">${{score}}%</span>
                 </div>
@@ -903,7 +1013,7 @@ component_html = f"""
             }} else {{
                 compGrid.innerHTML = data.completions.map((item, idx) => {{
                     const isTop = idx === 0;
-                    const colorClass = item.norm_score >= 50 ? 'circle-indigo' : (item.norm_score >= 25 ? 'circle-emerald' : 'circle-amber');
+                    const strokeColor = item.norm_score >= 50 ? '#4f46e5' : (item.norm_score >= 25 ? '#059669' : '#d97706');
                     return `
                         <div class="sugg-card ${{isTop ? 'top-rank' : ''}}" onclick="applyCompletion('${{item.word}}')">
                             ${{isTop ? '<span class="card-shortcut-hint">⇥ Tab</span>' : ''}}
@@ -918,7 +1028,7 @@ component_html = f"""
                                     <span>P=${{(item.prob * 100).toFixed(2)}}%</span>
                                 </div>
                             </div>
-                            ${{renderRadialGauge(item.norm_score, colorClass)}}
+                            ${{renderRadialGauge(item.norm_score, strokeColor)}}
                         </div>
                     `;
                 }}).join('');
@@ -931,14 +1041,14 @@ component_html = f"""
             }} else {{
                 nextGrid.innerHTML = data.next_words.map((item, idx) => {{
                     const isTop = idx === 0;
-                    const colorClass = item.norm_score >= 40 ? 'circle-emerald' : (item.norm_score >= 20 ? 'circle-indigo' : 'circle-amber');
+                    const strokeColor = item.norm_score >= 40 ? '#059669' : (item.norm_score >= 20 ? '#4f46e5' : '#d97706');
                     const displayLabel = item.is_eos ? 'Fin de phrase ↵' : item.display;
                     return `
                         <div class="sugg-card ${{isTop ? 'top-rank' : ''}}" onclick="applyNextWord('${{item.is_eos ? '.' : item.word}}')">
                             ${{isTop ? '<span class="card-shortcut-hint">→ Flèche</span>' : ''}}
                             <div class="sugg-info">
                                 <div class="sugg-word-row">
-                                    <span class="sugg-word" style="${{item.is_eos ? 'color:#f59e0b; font-style:italic;' : ''}}">
+                                    <span class="sugg-word" style="${{item.is_eos ? 'color:#d97706; font-style:italic;' : ''}}">
                                         ${{displayLabel}}
                                     </span>
                                 </div>
@@ -947,7 +1057,7 @@ component_html = f"""
                                     <span>P=${{(item.prob * 100).toFixed(2)}}%</span>
                                 </div>
                             </div>
-                            ${{renderRadialGauge(item.norm_score, colorClass)}}
+                            ${{renderRadialGauge(item.norm_score, strokeColor)}}
                         </div>
                     `;
                 }}).join('');
@@ -972,7 +1082,7 @@ component_html = f"""
                             </span>
                             <span class="sugg-meta">${{item.source}} • Confiance: ${{item.norm_score}}%</span>
                         </div>
-                        ${{renderRadialGauge(item.norm_score, 'circle-indigo')}}
+                        ${{renderRadialGauge(item.norm_score, '#4f46e5')}}
                     </div>
                 `;
             }}).join('');
@@ -994,7 +1104,7 @@ component_html = f"""
                             <span class="sugg-word">${{item.is_eos ? 'Fin de phrase ↵' : item.display}}</span>
                             <span class="sugg-meta">${{item.source}} • P=${{(item.prob * 100).toFixed(2)}}%</span>
                         </div>
-                        ${{renderRadialGauge(item.norm_score, 'circle-emerald')}}
+                        ${{renderRadialGauge(item.norm_score, '#059669')}}
                     </div>
                 `;
             }}).join('');
@@ -1063,7 +1173,7 @@ component_html = f"""
         }}
 
         // KEYBOARD EVENT LISTENERS FOR UNIFIED INPUT
-        unifiedInput.addEventListener('input', (e) => {{
+        unifiedInput.addEventListener('input', () => {{
             fetchSuggestions(unifiedInput.value, 'unified');
         }});
 
